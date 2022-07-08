@@ -1,3 +1,3 @@
-# Pyne Parse
+# Pyne
 
 Nessus parser written in Python.
