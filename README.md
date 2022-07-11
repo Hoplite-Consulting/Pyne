@@ -2,8 +2,6 @@
 
 Nessus parser written in Python.
 
-`
-
     usage: pyne.py [-h] [-w] [-s] [-f] [-v] [-S] nessusFiles [nessusFiles ...]
 
     Pyne 1.0.1
@@ -18,5 +16,3 @@ Nessus parser written in Python.
     -f, --force        force overwrite of file
     -v, --verbose
     -S, --SlowMode
-    
-`
