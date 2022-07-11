@@ -6,7 +6,7 @@ def getReportItems(elmnt: Element, elmntList: list) -> list[dict]:
         appDict = elmnt.attrib | item.attrib
         for var in elmntList:
             try:
-                appDict[var] = item.find(f"./{var}").text[:32600]
+                appDict[var] = item.find(f"./{var}").text[:32600] # Character Limit becasue Excel is lame...
             except:
                 pass
         retList.append(appDict)

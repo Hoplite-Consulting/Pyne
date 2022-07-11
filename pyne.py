@@ -8,16 +8,16 @@ from alive_progress import alive_bar, alive_it
 import time
 from os.path import exists
 
-
+# Get Default VARS.conf
 try:
     VARS = []
-    with open("config/defaultVARS.conf", "r") as f:
+    with open("config/VARS.conf", "r") as f:
         lines = f.readlines()
     for l in lines:
         VARS.append(l.strip())
 except:
-    print("Failed to read default VARS.")
-    VARS = ["risk_factor", "description", "solution", "plugin_type", "plugin_output", "cve", "see_also", "cvss_base_score", "exploit_available", "metasploit_name"]
+    print("Failed to read default VARS...")
+    VARS = ["description", "solution", "plugin_type", "plugin_output", "cve", "cvss_base_score"]
     print("Using Builtin List:", VARS)
 
 def main(args):
@@ -37,16 +37,17 @@ def main(args):
                 report["filename"] = file.split("/")[-1] # Add Filename to Report
                 reports.append(report)
     
+    # Get Default KEYS.conf
     try:
         keys = []
-        with open("config/defaultKeys.conf", "r") as f:
+        with open("config/KEYS.conf", "r") as f:
             lines = f.readlines()
         for l in lines:
             keys.append(l.strip())
     except:
-        print("Failed to read default keys.")
-        keys = ["pluginID", "pluginName", "severity", "risk_factor", "description", "solution", "name", "hostname", "plugin_type", "protocol", "port", "plugin_output", "cve", "see_also", "cvss_base_score", "exploit_available", "metasploit_name"]
-        print("Using Default List:", keys)
+        print("Failed to read default keys...")
+        keys = ["pluginID", "pluginName", "description", "solution", "name", "protocol", "port"]
+        print("Using Builtin List:", keys)
 
     for rep in reports:
         for key in rep.keys():
@@ -58,7 +59,7 @@ def main(args):
     if args.writeFile:
         if exists(args.writeFile):
             while True:
-                if args.overWrite:
+                if args.force:
                     break
                 i = input("Overwrite (y/n): ")
                 if i.lower() == "y":
@@ -80,12 +81,12 @@ if __name__ == "__main__":
 
     __version__ = "1.0.0"
 
-    parser = argparse.ArgumentParser(description=f"Pyne Parse {__version__}")
+    parser = argparse.ArgumentParser(description=f"Pyne {__version__}")
     parser.add_argument('nessusFiles', type=str, nargs='+')
     parser.add_argument('-w', '--writeFile', metavar='', help='path to write file')
     parser.add_argument('-s', '--sort', action='store_true', help='sort keys alphabetically')
+    parser.add_argument('-f', '--force', action='store_true', help='force overwrite of file')
     parser.add_argument('-v', '--verbose', action='store_true')
-    parser.add_argument('-o', '--overWrite', action='store_true')
     parser.add_argument('-S', '--SlowMode', action='store_true')
     args = parser.parse_args()
 
