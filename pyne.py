@@ -79,7 +79,7 @@ def main(args):
 
 if __name__ == "__main__":
 
-    __version__ = "1.0.0"
+    __version__ = "1.0.1"
 
     parser = argparse.ArgumentParser(description=f"Pyne {__version__}")
     parser.add_argument('nessusFiles', type=str, nargs='+')
