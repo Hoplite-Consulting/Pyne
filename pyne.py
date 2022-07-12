@@ -8,13 +8,18 @@ from alive_progress import alive_bar, alive_it
 import time
 from os.path import exists
 
-# Get Default VARS.conf
+# Get Default REPORT.conf
 try:
     VARS = []
-    with open("config/VARS.conf", "r") as f:
+    with open("config/REPORT.conf", "r") as f:
         lines = f.readlines()
     for l in lines:
-        VARS.append(l.strip())
+        if l[0] == '#':
+            continue
+        elif l == '':
+                continue
+        else:
+            VARS.append(l.strip())
 except:
     print("Failed to read default VARS...")
     VARS = ["description", "solution", "plugin_type", "plugin_output", "cve", "cvss_base_score"]
@@ -32,18 +37,24 @@ def main(args):
         for reportHost in bar:
             if args.SlowMode:
                 time.sleep(.01)
+            # get host data here
             repItems = utils.getReportItems(reportHost, VARS)
             for report in repItems:
                 report["filename"] = file.split("/")[-1] # Add Filename to Report
                 reports.append(report)
     
-    # Get Default KEYS.conf
+    # Get Default SORT.conf
     try:
         keys = []
-        with open("config/KEYS.conf", "r") as f:
+        with open("config/SORT.conf", "r") as f:
             lines = f.readlines()
         for l in lines:
-            keys.append(l.strip())
+            if l[0] == '#':
+                continue
+            elif l == '':
+                continue
+            else:
+                keys.append(l.strip())
     except:
         print("Failed to read default keys...")
         keys = ["pluginID", "pluginName", "description", "solution", "name", "protocol", "port"]
@@ -79,7 +90,7 @@ def main(args):
 
 if __name__ == "__main__":
 
-    __version__ = "1.0.1"
+    __version__ = "1.0.2"
 
     parser = argparse.ArgumentParser(description=f"Pyne {__version__}")
     parser.add_argument('nessusFiles', type=str, nargs='+')
