@@ -19,18 +19,18 @@ pip3 install -r requirements.txt
 ```
 
 ```
-usage: pyne.py [-h] [-w] [-s] [-f] [-v] [-S] nessusFiles [nessusFiles ...]
+usage: pyne.py [-h] [-s] [-f] [-v] [-S] nessusFiles [nessusFiles ...] writeFile
 
-Pyne 1.1.1
+Pyne 1.1.2
 
 positional arguments:
-nessusFiles
+  nessusFiles     nessus file
+  writeFile       path to write file
 
 options:
--h, --help         show this help message and exit
--w , --writeFile   path to write file
--s, --sort         sort keys alphabetically
--f, --force        force overwrite of file
--v, --verbose
--S, --SlowMode
+  -h, --help      show this help message and exit
+  -s, --sort      sort keys alphabetically
+  -f, --force     force overwrite of write file
+  -v, --verbose
+  -S, --SlowMode
 ```
