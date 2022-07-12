@@ -16,14 +16,31 @@ try:
     for l in lines:
         if l[0] == '#':
             continue
-        elif l == '':
+        elif l.strip() == '':
                 continue
         else:
             VARS.append(l.strip())
 except:
-    print("Failed to read default VARS...")
+    print("Failed to read default REPORT...")
     VARS = ["description", "solution", "plugin_type", "plugin_output", "cve", "cvss_base_score"]
     print("Using Builtin List:", VARS)
+
+# Get Default HOST.conf
+try:
+    HOST = []
+    with open("config/HOST.conf", "r") as f:
+        lines = f.readlines()
+    for l in lines:
+        if l[0] == '#':
+            continue
+        elif l.strip() == '':
+            continue
+        else:
+            HOST.append(l.strip())
+except:
+    print("Failed to read default HOST")
+    HOST = ["operating-system", "host-ip"]
+    print("Using default list:", HOST)
 
 def main(args):
     reports = []
@@ -33,15 +50,18 @@ def main(args):
         except:
             print("Unable to open file ", file)
             continue
-        bar = alive_it(scan.getroot().findall('./Report/ReportHost'), title="Reading Reports...")
+        bar = alive_it(scan.getroot().findall('./Report/ReportHost')[:1], title="Reading Reports...")
         for reportHost in bar:
             if args.SlowMode:
                 time.sleep(.01)
-            # get host data here
+            repHost = utils.getHostItems(reportHost, HOST)
             repItems = utils.getReportItems(reportHost, VARS)
             for report in repItems:
+                # print(repHost, report)
+                # exit()
+                # add host data to report
                 report["filename"] = file.split("/")[-1] # Add Filename to Report
-                reports.append(report)
+                reports.append(report | repHost)
     
     # Get Default SORT.conf
     try:
@@ -51,7 +71,7 @@ def main(args):
         for l in lines:
             if l[0] == '#':
                 continue
-            elif l == '':
+            elif l.strip() == '':
                 continue
             else:
                 keys.append(l.strip())
@@ -90,7 +110,7 @@ def main(args):
 
 if __name__ == "__main__":
 
-    __version__ = "1.0.2"
+    __version__ = "1.1.0"
 
     parser = argparse.ArgumentParser(description=f"Pyne {__version__}")
     parser.add_argument('nessusFiles', type=str, nargs='+')

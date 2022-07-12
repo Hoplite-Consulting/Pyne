@@ -4,7 +4,7 @@ Nessus parser written in Python.
 
     usage: pyne.py [-h] [-w] [-s] [-f] [-v] [-S] nessusFiles [nessusFiles ...]
 
-    Pyne 1.0.2
+    Pyne 1.1.0
 
     positional arguments:
     nessusFiles

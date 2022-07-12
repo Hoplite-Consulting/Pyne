@@ -11,3 +11,14 @@ def getReportItems(elmnt: Element, elmntList: list) -> list[dict]:
                 pass
         retList.append(appDict)
     return retList
+
+def getHostItems(elmnt: Element, elmntList: list) -> dict:
+    retDict = {}
+    for item in elmnt.findall("./HostProperties"):
+        for i in item.findall("./tag"):
+            if i.attrib['name'] in elmntList:
+                retDict[i.attrib['name']] = i.text
+            else:
+                continue
+    # return retDict | elmnt.attrib
+    return retDict
