@@ -74,8 +74,8 @@ if __name__ == "__main__":
     parser.add_argument('writeFile', help='path to write file')
     parser.add_argument('-s', '--sort', action='store_true', help='sort keys alphabetically')
     parser.add_argument('-f', '--force', action='store_true', help='force overwrite of write file')
-    parser.add_argument('-v', '--verbose', action='store_true')
-    parser.add_argument('-S', '--SlowMode', action='store_true')
+    parser.add_argument('-v', '--verbose', action='store_true', help='verbose output')
+    parser.add_argument('-S', '--SlowMode', action='store_true', help='run slowly')
     args = parser.parse_args()
 
     main(args)

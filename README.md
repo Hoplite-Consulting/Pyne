@@ -19,7 +19,8 @@ pip3 install -r requirements.txt
 ```
 
 ```
-usage: pyne.py [-h] [-s] [-f] [-v] [-S] nessusFiles [nessusFiles ...] writeFile
+usage: pyne.py [-h] [-s] [-f] [-v] [-S]
+               nessusFiles [nessusFiles ...] writeFile
 
 Pyne 1.1.2
 
@@ -31,6 +32,6 @@ options:
   -h, --help      show this help message and exit
   -s, --sort      sort keys alphabetically
   -f, --force     force overwrite of write file
-  -v, --verbose
-  -S, --SlowMode
+  -v, --verbose   verbose output
+  -S, --SlowMode  run slowly
 ```
