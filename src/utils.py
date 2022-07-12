@@ -22,3 +22,33 @@ def getHostItems(elmnt: Element, elmntList: list) -> dict:
                 continue
     # return retDict | elmnt.attrib
     return retDict
+
+def readConfig(PATH: str) -> list:
+    DEF_HOST = ["operating-system", "host-ip"]
+    DEF_SORT = ["pluginID", "pluginName", "description", "solution", "name", "protocol", "port"]
+    DEF_REPORT = ["description", "solution", "plugin_type", "plugin_output", "cve", "cvss_base_score"]
+
+    try:
+        VAR = []
+        with open(PATH, "r") as f:
+            lines = f.readlines()
+        for l in lines:
+            if l[0] == '#':
+                continue
+            elif l.strip() == '':
+                continue
+            else:
+                VAR.append(l.strip())
+    except:
+        print(f"Failed to read config file {PATH}...")
+        if "HOST" in PATH:
+            print("Using Default List:", DEF_HOST)
+            VAR = DEF_HOST
+        elif "SORT" in PATH:
+            print("Using Default List:", DEF_SORT)
+            VAR = DEF_SORT
+        elif "REPORT" in PATH:
+            print("Using Default List:", DEF_REPORT)
+            VAR = DEF_REPORT
+    
+    return VAR

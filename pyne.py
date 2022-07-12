@@ -4,43 +4,15 @@ from csv import DictWriter
 from src import *
 import argparse
 import xml.etree.ElementTree as ET
-from alive_progress import alive_bar, alive_it
+from alive_progress import alive_it
 import time
 from os.path import exists
 
 # Get Default REPORT.conf
-try:
-    VARS = []
-    with open("config/REPORT.conf", "r") as f:
-        lines = f.readlines()
-    for l in lines:
-        if l[0] == '#':
-            continue
-        elif l.strip() == '':
-                continue
-        else:
-            VARS.append(l.strip())
-except:
-    print("Failed to read default REPORT...")
-    VARS = ["description", "solution", "plugin_type", "plugin_output", "cve", "cvss_base_score"]
-    print("Using Builtin List:", VARS)
+VARS = utils.readConfig("config/REPORT.conf")
 
 # Get Default HOST.conf
-try:
-    HOST = []
-    with open("config/HOST.conf", "r") as f:
-        lines = f.readlines()
-    for l in lines:
-        if l[0] == '#':
-            continue
-        elif l.strip() == '':
-            continue
-        else:
-            HOST.append(l.strip())
-except:
-    print("Failed to read default HOST")
-    HOST = ["operating-system", "host-ip"]
-    print("Using default list:", HOST)
+HOST = utils.readConfig("config/HOST.conf")
 
 def main(args):
     reports = []
@@ -50,36 +22,20 @@ def main(args):
         except:
             print("Unable to open file ", file)
             continue
-        bar = alive_it(scan.getroot().findall('./Report/ReportHost')[:1], title="Reading Reports...")
+        bar = alive_it(scan.getroot().findall('./Report/ReportHost'), title="Reading Reports...")
         for reportHost in bar:
             if args.SlowMode:
                 time.sleep(.01)
             repHost = utils.getHostItems(reportHost, HOST)
             repItems = utils.getReportItems(reportHost, VARS)
             for report in repItems:
-                # print(repHost, report)
-                # exit()
-                # add host data to report
                 report["filename"] = file.split("/")[-1] # Add Filename to Report
                 reports.append(report | repHost)
     
     # Get Default SORT.conf
-    try:
-        keys = []
-        with open("config/SORT.conf", "r") as f:
-            lines = f.readlines()
-        for l in lines:
-            if l[0] == '#':
-                continue
-            elif l.strip() == '':
-                continue
-            else:
-                keys.append(l.strip())
-    except:
-        print("Failed to read default keys...")
-        keys = ["pluginID", "pluginName", "description", "solution", "name", "protocol", "port"]
-        print("Using Builtin List:", keys)
+    keys = utils.readConfig("config/SORT.conf")
 
+    # Add all Missing Keys
     for rep in reports:
         for key in rep.keys():
             if key not in keys:
@@ -87,6 +43,7 @@ def main(args):
     if args.sort:
         keys.sort()
 
+    # Save to File
     if args.writeFile:
         if exists(args.writeFile):
             while True:
@@ -110,7 +67,7 @@ def main(args):
 
 if __name__ == "__main__":
 
-    __version__ = "1.1.0"
+    __version__ = "1.1.1"
 
     parser = argparse.ArgumentParser(description=f"Pyne {__version__}")
     parser.add_argument('nessusFiles', type=str, nargs='+')
