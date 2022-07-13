@@ -26,8 +26,7 @@ pip3 install -r requirements.txt
 	 | |    | |_| | | | ( (/ / 
 	 |_|     \__  |_| |_|\____)
 	        (____/             
-usage: pyne.py [-h] [-s] [-f] [-v] [-S]
-               nessusFiles [nessusFiles ...] writeFile
+usage: pyne.py [-h] [-s] [-f] [-v] [-S] nessusFiles [nessusFiles ...] writeFile
 
 Pyne 1.1.3
 
