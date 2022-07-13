@@ -67,7 +67,7 @@ def main(args):
 
 if __name__ == "__main__":
 
-    __version__ = "1.1.3"
+    __version__ = "1.1.4"
 
     with open("src/TITLE", "r") as title:
         lines = title.readlines()
