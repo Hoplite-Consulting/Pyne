@@ -67,7 +67,12 @@ def main(args):
 
 if __name__ == "__main__":
 
-    __version__ = "1.1.2"
+    __version__ = "1.1.3"
+
+    with open("src/TITLE", "r") as title:
+        lines = title.readlines()
+    for l in lines:
+        print("\t",l.replace("\n", ""))
 
     parser = argparse.ArgumentParser(description=f"Pyne {__version__}")
     parser.add_argument('nessusFiles', type=str, nargs='+', help='nessus file')
