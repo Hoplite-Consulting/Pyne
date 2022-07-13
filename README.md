@@ -28,7 +28,7 @@ pip3 install -r requirements.txt
 	        (____/             
 usage: pyne.py [-h] [-s] [-f] [-v] [-S] nessusFiles [nessusFiles ...] writeFile
 
-Pyne 1.1.3
+Pyne 1.1.4
 
 positional arguments:
   nessusFiles     nessus file
