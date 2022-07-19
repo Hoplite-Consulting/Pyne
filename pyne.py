@@ -7,6 +7,7 @@ import xml.etree.ElementTree as ET
 from alive_progress import alive_it
 import time
 from os.path import exists
+import pyfiglet
 
 # Get Default REPORT.conf
 VARS = utils.readConfig("config/REPORT.conf")
@@ -15,6 +16,9 @@ VARS = utils.readConfig("config/REPORT.conf")
 HOST = utils.readConfig("config/HOST.conf")
 
 def main(args):
+
+    print(TITLE)
+
     reports = []
     for file in args.nessusFiles:
         try:
@@ -67,14 +71,11 @@ def main(args):
 
 if __name__ == "__main__":
 
-    __version__ = "1.1.4"
+    __version__ = "1.1.5"
+    NAME = "Pyne"
+    TITLE = pyfiglet.figlet_format(NAME, font="stop") + f"\n{NAME} {__version__}\n"
 
-    with open("src/TITLE", "r") as title:
-        lines = title.readlines()
-    for l in lines:
-        print("\t",l.replace("\n", ""))
-
-    parser = argparse.ArgumentParser(description=f"Pyne {__version__}")
+    parser = argparse.ArgumentParser(description=f"{TITLE}", formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('nessusFiles', type=str, nargs='+', help='nessus file')
     parser.add_argument('writeFile', help='path to write file')
     parser.add_argument('-s', '--sort', action='store_true', help='sort keys alphabetically')

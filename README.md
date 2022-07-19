@@ -19,16 +19,17 @@ pip3 install -r requirements.txt
 ```
 
 ```
-	  ______                   
-	 (_____ \                  
-	  _____) )   _ ____   ____ 
-	 |  ____/ | | |  _ \ / _  )
-	 | |    | |_| | | | ( (/ / 
-	 |_|     \__  |_| |_|\____)
-	        (____/             
 usage: pyne.py [-h] [-s] [-f] [-v] [-S] nessusFiles [nessusFiles ...] writeFile
 
-Pyne 1.1.4
+ ______                   
+(_____ \                  
+ _____) )   _ ____   ____ 
+|  ____/ | | |  _ \ / _  )
+| |    | |_| | | | ( (/ / 
+|_|     \__  |_| |_|\____)
+       (____/             
+
+Pyne 1.1.5
 
 positional arguments:
   nessusFiles     nessus file
