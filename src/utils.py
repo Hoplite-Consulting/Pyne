@@ -24,7 +24,7 @@ def getHostItems(elmnt: Element, elmntList: list) -> dict:
     return retDict
 
 def readConfig(PATH: str) -> list:
-    DEF_HOST = ["operating-system", "host-ip"]
+    DEF_HOST = ["operating-system", "host-ip", "host-fqdn"]
     DEF_SORT = ["pluginID", "pluginName", "description", "solution", "name", "protocol", "port"]
     DEF_REPORT = ["description", "solution", "plugin_type", "plugin_output", "cve", "cvss_base_score"]
 

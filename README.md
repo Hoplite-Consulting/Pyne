@@ -29,7 +29,7 @@ usage: pyne.py [-h] [-s] [-f] [-v] [-S] nessusFiles [nessusFiles ...] writeFile
 |_|     \__  |_| |_|\____)
        (____/             
 
-Pyne 1.1.5
+Pyne 1.1.6
 
 positional arguments:
   nessusFiles     nessus file

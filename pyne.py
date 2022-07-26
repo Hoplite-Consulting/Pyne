@@ -1,4 +1,4 @@
-#!/bin/python3
+#!/usr/bin/python3
 
 from csv import DictWriter
 from src import *
@@ -34,6 +34,7 @@ def main(args):
             repItems = utils.getReportItems(reportHost, VARS)
             for report in repItems:
                 report["filename"] = file.split("/")[-1] # Add Filename to Report
+                report["uid"] = report["pluginID"] + "-" + report["port"] + "-" + repHost["host-fqdn"]
                 reports.append(report | repHost)
     
     # Get Default SORT.conf
@@ -71,7 +72,7 @@ def main(args):
 
 if __name__ == "__main__":
 
-    __version__ = "1.1.5"
+    __version__ = "1.1.6"
     NAME = "Pyne"
     TITLE = pyfiglet.figlet_format(NAME, font="stop") + f"\n{NAME} {__version__}\n"
 
