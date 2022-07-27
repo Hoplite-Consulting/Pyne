@@ -3,7 +3,7 @@ on:
   release:
   workflow_dispatch:
 jobs:
-  generate:
+  Release:
     runs-on: ubuntu-latest
     steps:
       - uses: peterjgrainger/action-create-branch@v2.2.0
