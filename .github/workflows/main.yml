@@ -1,10 +1,10 @@
+name: Create Release Branch
 on:
   workflow_dispatch:
-    inputs:
-      name:
-        required: false
 jobs:
-  release:
-    uses: peterjgrainger/action-create-branch@v2.0.1
-    with:
-      branch: release
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: peterjgrainger/action-create-branch@v2.2.0
+        with:
+          branch: release
