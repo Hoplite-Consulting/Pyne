@@ -1,0 +1,13 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Release Branch
+
+on:
+  release:
+  workflow_dispatch:
+
+jobs:
+build:
+uses: peterjgrainger/action-create-branch@v2.0.1
+with:
+branch:release
