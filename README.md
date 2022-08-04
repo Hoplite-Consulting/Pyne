@@ -19,7 +19,7 @@ pip3 install -r requirements.txt
 ```
 
 ```
-usage: pyne.py [-h] [-s] [-f] [-v] [-S] nessusFiles [nessusFiles ...] writeFile
+usage: pyne.py [-h] [-s] [-f] [-U] [-S] nessusFiles [nessusFiles ...] writeFile
 
  ______                   
 (_____ \                  
@@ -29,7 +29,7 @@ usage: pyne.py [-h] [-s] [-f] [-v] [-S] nessusFiles [nessusFiles ...] writeFile
 |_|     \__  |_| |_|\____)
        (____/             
 
-Pyne 1.1.7
+Pyne 1.1.8
 
 positional arguments:
   nessusFiles     nessus file
@@ -39,6 +39,6 @@ options:
   -h, --help      show this help message and exit
   -s, --sort      sort keys alphabetically
   -f, --force     force overwrite of write file
-  -v, --verbose   verbose output
+  -U, --UID       add unique id to each finding
   -S, --SlowMode  run slowly
 ```

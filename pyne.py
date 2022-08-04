@@ -34,7 +34,12 @@ def main(args):
             repItems = utils.getReportItems(reportHost, VARS)
             for report in repItems:
                 report["filename"] = file.split("/")[-1] # Add Filename to Report
-                report["uid"] = report["pluginID"] + "-" + report["port"] + "-" + repHost["host-fqdn"]
+                if args.UID:
+                    try:
+                        report["uid"] = report["pluginID"] + "-" + report["port"] + "-" + repHost["host-fqdn"]
+                    except KeyError:
+                        report["uid"] = report["pluginID"] + "-" + report["port"] + "-" + repHost["host-ip"]
+                        print("[WARNING] No host-fqdn found for", repHost["host-ip"], "Using host-ip, this may not be consistent if comparing multiple scans.")
                 reports.append(report | repHost)
     
     # Get Default SORT.conf
@@ -72,7 +77,7 @@ def main(args):
 
 if __name__ == "__main__":
 
-    __version__ = "1.1.7"
+    __version__ = "1.1.8"
     NAME = "Pyne"
     TITLE = pyfiglet.figlet_format(NAME, font="stop") + f"\n{NAME} {__version__}\n"
 
@@ -81,7 +86,7 @@ if __name__ == "__main__":
     parser.add_argument('writeFile', help='path to write file')
     parser.add_argument('-s', '--sort', action='store_true', help='sort keys alphabetically')
     parser.add_argument('-f', '--force', action='store_true', help='force overwrite of write file')
-    parser.add_argument('-v', '--verbose', action='store_true', help='verbose output')
+    parser.add_argument('-U', '--UID', action='store_true', help='add unique id to each finding')
     parser.add_argument('-S', '--SlowMode', action='store_true', help='run slowly')
     args = parser.parse_args()
 
