@@ -77,7 +77,7 @@ def main(args):
 
 if __name__ == "__main__":
 
-    __version__ = "1.1.7"
+    __version__ = "1.1.8"
     NAME = "Pyne"
     TITLE = pyfiglet.figlet_format(NAME, font="stop") + f"\n{NAME} {__version__}\n"
 
