@@ -1,4 +1,5 @@
 from xml.etree.ElementTree import Element
+import fnmatch
 
 def getReportItems(elmnt: Element, elmntList: list) -> list[dict]:
     retList = []
@@ -52,3 +53,23 @@ def readConfig(PATH: str) -> list:
             VAR = DEF_REPORT
     
     return VAR
+
+def getCategory(TITLE: str, SOLUTION: str) -> str:
+
+    try:
+        ms_patch = fnmatch.filter(TITLE.split(" "), "MS??-???")[0]
+    except:
+        ms_patch = "MS??-???"
+
+    if "unsupported version" in TITLE:
+        return "Unsupported Application"
+    elif "unsupported" in TITLE:
+        return "Unsupported Operating System"
+    elif ms_patch in TITLE or "bluekeep" in TITLE or "Sigrid" in TITLE or "Petitpotam" in TITLE or "SMBv1" in TITLE:
+        return "Missing Microsoft Patches"
+    elif "<" in TITLE or "upgrade" in SOLUTION or "update" in SOLUTION:
+        return "Missing Patches and Updates"
+    elif "unprivileged" in TITLE or "unauthenticated" in TITLE or "unprotected" in TITLE or "NFS" in TITLE:
+        return "Insecure Access Controls"
+    else:
+        return "Insecure Configurations and Services"
