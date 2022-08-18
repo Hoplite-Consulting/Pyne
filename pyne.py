@@ -34,7 +34,7 @@ def main(args):
             repItems = utils.getReportItems(reportHost, VARS)
             for report in repItems:
                 report["filename"] = file.split("/")[-1] # Add Filename to Report
-                if args.category:
+                if args.CATEGORY:
                     report["category"] = utils.getCategory(report['pluginName'], report['solution']) # Add Category to Report
                 if args.UID:
                     try:
@@ -79,7 +79,7 @@ def main(args):
 
 if __name__ == "__main__":
 
-    __version__ = "1.2.0"
+    __version__ = "1.2.1"
     NAME = "Pyne"
     TITLE = pyfiglet.figlet_format(NAME, font="stop") + f"\n{NAME} {__version__}\n"
 
@@ -88,7 +88,7 @@ if __name__ == "__main__":
     parser.add_argument('writeFile', help='path to write file')
     parser.add_argument('-s', '--sort', action='store_true', help='sort keys alphabetically')
     parser.add_argument('-f', '--force', action='store_true', help='force overwrite of write file')
-    parser.add_argument('-C', '--CATEGPRY', action='store_true', help='add category to each finding')
+    parser.add_argument('-C', '--CATEGORY', action='store_true', help='add category to each finding')
     parser.add_argument('-U', '--UID', action='store_true', help='add unique id to each finding')
     parser.add_argument('-S', '--SlowMode', action='store_true', help='run slowly')
     args = parser.parse_args()
