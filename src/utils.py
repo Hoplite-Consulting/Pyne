@@ -54,7 +54,10 @@ def readConfig(PATH: str) -> list:
     
     return VAR
 
-def getCategory(TITLE: str, SOLUTION: str) -> str:
+def getCategory(title: str, solution: str) -> str:
+
+    TITLE = title.lower()
+    SOLUTION = solution.lower()
 
     try:
         ms_patch = fnmatch.filter(TITLE.split(" "), "MS??-???")[0]
