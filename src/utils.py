@@ -60,7 +60,7 @@ def getCategory(title: str, solution: str) -> str:
     SOLUTION = solution.lower()
 
     try:
-        ms_patch = fnmatch.filter(TITLE.split(" "), "MS??-???")[0]
+        ms_patch = fnmatch.filter(TITLE.split(" "), "ms??-???")[0]
     except:
         ms_patch = "MS??-???"
 
@@ -68,11 +68,11 @@ def getCategory(title: str, solution: str) -> str:
         return "Unsupported Application"
     elif "unsupported" in TITLE:
         return "Unsupported Operating System"
-    elif ms_patch in TITLE or "bluekeep" in TITLE or "Sigrid" in TITLE or "Petitpotam" in TITLE or "SMBv1" in TITLE:
+    elif ms_patch in TITLE or "bluekeep" in TITLE or "sigrid" in TITLE or "petitpotam" in TITLE or "smbv1" in TITLE:
         return "Missing Microsoft Patches"
     elif "<" in TITLE or "upgrade" in SOLUTION or "update" in SOLUTION:
         return "Missing Patches and Updates"
-    elif "unprivileged" in TITLE or "unauthenticated" in TITLE or "unprotected" in TITLE or "NFS" in TITLE:
+    elif "unprivileged" in TITLE or "unauthenticated" in TITLE or "unprotected" in TITLE or "nfs" in TITLE:
         return "Insecure Access Controls"
     else:
         return "Insecure Configurations and Services"
