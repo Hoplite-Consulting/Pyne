@@ -54,15 +54,22 @@ def readConfig(PATH: str) -> list:
     
     return VAR
 
-def getCategory(title: str, solution: str) -> str:
+def getCategory(title: str, solution: str, severity: str) -> str:
 
     TITLE = title.lower()
     SOLUTION = solution.lower()
+    SEVERITY = int(severity)
+
+    if SEVERITY == 0:
+        return "Informational"
 
     try:
         ms_patch = fnmatch.filter(TITLE.split(" "), "ms??-???")[0]
     except:
-        ms_patch = "MS??-???"
+        try:
+            ms_patch = fnmatch.filter(TITLE.split(":"), "ms??-???")[0]
+        except:
+            ms_patch = "MS??-???"
 
     if "unsupported version" in TITLE:
         return "Unsupported Application"
