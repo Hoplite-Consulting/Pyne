@@ -35,7 +35,7 @@ def main(args):
             for report in repItems:
                 report["filename"] = file.split("/")[-1] # Add Filename to Report
                 if args.CATEGORY:
-                    report["category"] = utils.getCategory(report['pluginName'], report['solution']) # Add Category to Report
+                    report["category"] = utils.getCategory(report['pluginName'], report['solution'], report['severity']) # Add Category to Report
                 if args.UID:
                     try:
                         report["uid"] = report["pluginID"] + "-" + report["port"] + "-" + repHost["host-fqdn"]
@@ -79,7 +79,7 @@ def main(args):
 
 if __name__ == "__main__":
 
-    __version__ = "1.2.3"
+    __version__ = "1.2.4"
     NAME = "Pyne"
     TITLE = pyfiglet.figlet_format(NAME, font="stop") + f"\n{NAME} {__version__}\n"
 
