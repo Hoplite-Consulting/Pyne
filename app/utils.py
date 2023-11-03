@@ -88,5 +88,7 @@ def getCategory(title: str, solution: str, severity: str) -> str:
         return "Missing Patches and Updates"
     elif "unprivileged" in TITLE or "unauthenticated" in TITLE or "unprotected" in TITLE or "nfs" in TITLE:
         return "Insecure Access Controls"
+    elif "SSL" in TITLE or "TLS" in TITLE:
+        return "Insecure SSL/TLS Configurations or Services"
     else:
-        return "Insecure Configurations and Services"
+        return "Insecure Configurations or Services"
