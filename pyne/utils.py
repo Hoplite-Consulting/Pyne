@@ -1,10 +1,11 @@
 from xml.etree.ElementTree import Element
 import fnmatch
-from os.path import exists
+from os.path import exists, splitext
 from csv import DictWriter
 from .platypus import *
 from alive_progress import alive_it
 import pkg_resources
+import time
 
 SORT_PATH = pkg_resources.resource_filename("pyne.config", "SORT.conf")
 
@@ -118,22 +119,32 @@ def saveCSVFile(reports: list, filePath: str, args) -> bool:
     # Check is OutFile Already Exists
     if not args.force:
         try:
-            if exists(f"{filePath}.csv"):
+            if exists(f"{filePath}"):
                 raise FileExistsError
         except FileExistsError as err:
-            print(f"Output File Already Exists: {filePath}.csv")
+            print(f"Output File Already Exists: {filePath}")
             if args.verbose:
                 print(err)
             if args.Application:
-                platypusAlert("Output File Already Exists", f"{filePath}.csv")
+                platypusAlert("Output File Already Exists", f"{filePath}")
             return False
 
     # Write to OutFile
-    with open(f"{filePath}.csv", "w") as outFile:
+    with open(f"{filePath}", "w") as outFile:
          writer = DictWriter(outFile, SORT_CONFIG)
          writer.writeheader()
          bar = alive_it(reports, title=f"Writing to file... {filePath}")
          for report in bar:
+              if args.Slow:
+                time.sleep(.001)
               writer.writerow(report)
 
     return True
+
+def getFileType(files: list, type: str, args) -> list:
+    nessusFiles = []
+    for file in files:
+        fileType = splitext(file)[1]
+        if fileType == type:
+            nessusFiles.append(file)
+    return nessusFiles
