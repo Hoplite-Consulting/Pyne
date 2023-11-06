@@ -1,5 +1,12 @@
 from xml.etree.ElementTree import Element
 import fnmatch
+from os.path import exists
+from csv import DictWriter
+from .platypus import *
+from alive_progress import alive_it
+import pkg_resources
+
+SORT_PATH = pkg_resources.resource_filename("pyne.config", "SORT.conf")
 
 def readConfig(PATH: str) -> list:
     """_summary_
@@ -92,3 +99,41 @@ def getCategory(title: str, solution: str, severity: str) -> str:
         return "Insecure SSL/TLS Configurations or Services"
     else:
         return "Insecure Configurations or Services"
+    
+def saveCSVFile(reports: list, filePath: str, args) -> bool:
+
+    # Initial Sort Config Reset for Each Report
+    SORT_CONFIG = readConfig(SORT_PATH)
+
+    # Add Any Missing Keys
+    for report in reports:
+         for key in report.keys():
+              if key not in SORT_CONFIG:
+                   SORT_CONFIG.append(key)
+    
+    # Sort if Argument Present
+    if args.sort:
+         SORT_CONFIG.sort()
+    
+    # Check is OutFile Already Exists
+    if not args.force:
+        try:
+            if exists(f"{filePath}.csv"):
+                raise FileExistsError
+        except FileExistsError as err:
+            print(f"Output File Already Exists: {filePath}.csv")
+            if args.verbose:
+                print(err)
+            if args.Application:
+                platypusAlert("Output File Already Exists", f"{filePath}.csv")
+            return False
+
+    # Write to OutFile
+    with open(f"{filePath}.csv", "w") as outFile:
+         writer = DictWriter(outFile, SORT_CONFIG)
+         writer.writeheader()
+         bar = alive_it(reports, title=f"Writing to file... {filePath}")
+         for report in bar:
+              writer.writerow(report)
+
+    return True
