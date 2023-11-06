@@ -88,11 +88,12 @@ def main(nessusFiles, args):
           if args.Application:
                platypusNotification("Parse Completed", f"Output Saved to {args.out}")
 
-     platypusNotification("Parse Complete", "All Nessus files have been parsed.")
+     if args.Application:
+          platypusNotification("Parse Complete", "All Nessus files have been parsed.")
 
 def setup():
 
-     __version__ = "2.0.1"
+     __version__ = "2.0.2"
      NAME = "Pyne"
      DESC = """
      Pyne is a .nessus file parser.

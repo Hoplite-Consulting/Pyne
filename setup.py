@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="Pyne",
-    version="2.0.1",
+    version="2.0.2",
     description="Nessus Parser",
     author="Oliver Scotten",
     author_email="oliver@hopliteconsulting.com",
