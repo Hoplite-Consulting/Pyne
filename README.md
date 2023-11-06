@@ -32,7 +32,7 @@ usage: pyne [-h] [-o OUT] [-s] [-v] [-F] [-C] [-U] nessusFiles [nessusFiles ...]
        (____/             
 
 Pyne
-2.0.2
+2.0.3
 
      Pyne is a .nessus file parser.
 

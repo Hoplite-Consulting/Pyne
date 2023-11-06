@@ -44,7 +44,7 @@ def parseNessusFile(filePath: str, args) -> list:
           for header in repHeaders:
                if args.out != None:
                     header["origin-filename"] = filePath.split("/")[-1] # Add Filename to Report
-               if args.CATEGORY:
+               if args.Category:
                     header["category"] = getCategory(header['pluginName'], header['solution'], header['severity'])
                if args.UID:
                     try:
@@ -93,7 +93,7 @@ def main(nessusFiles, args):
 
 def setup():
 
-     __version__ = "2.0.2"
+     __version__ = "2.0.3"
      NAME = "Pyne"
      DESC = """
      Pyne is a .nessus file parser.
