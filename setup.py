@@ -16,5 +16,5 @@ setup(
             "pyne = pyne.pyne:setup",
         ],
     },
-    package_data={"pyne": ["config/*"]},xs
+    package_data={"pyne": ["config/*"]}
 )
