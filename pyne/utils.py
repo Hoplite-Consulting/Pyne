@@ -117,7 +117,7 @@ def saveCSVFile(reports: list, filePath: str, args) -> bool:
          SORT_CONFIG.sort()
     
     # Check is OutFile Already Exists
-    if not args.force:
+    if not args.Force:
         try:
             if exists(f"{filePath}"):
                 raise FileExistsError

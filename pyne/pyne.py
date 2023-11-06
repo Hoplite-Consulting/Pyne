@@ -92,7 +92,7 @@ def main(nessusFiles, args):
 
 def setup():
 
-     __version__ = "2.0.0"
+     __version__ = "2.0.1"
      NAME = "Pyne"
      DESC = """
      Pyne is a .nessus file parser.
