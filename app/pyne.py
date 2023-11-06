@@ -79,7 +79,7 @@ def parseNessusFile(filePath: str, args):
 
 if __name__ == "__main__":
 
-     __version__ = "2.0.0"
+     __version__ = "2.0.1"
      NAME = "Pyne"
      TITLE = pyfiglet.figlet_format(NAME, font="stop") + f"\n{NAME}\n{__version__}"
 
@@ -90,7 +90,7 @@ if __name__ == "__main__":
      PARSER.add_argument('-v', '--verbose', action='store_true', help='verbose error messaging')
      PARSER.add_argument('-C', '--CATEGORY', action='store_true', help='add category to each finding')
      PARSER.add_argument('-U', '--UID', action='store_true', help='add unique id to each finding')
-     PARSER.add_argument('-A', '--Application', action='store_true', help='application mode extended output')
+     PARSER.add_argument('-A', '--Application', action='store_true', help='application mode extended output (not used in cli)')
 
      args = PARSER.parse_args()
 

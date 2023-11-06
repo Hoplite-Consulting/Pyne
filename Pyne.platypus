@@ -49,7 +49,7 @@
 	<key>Identifier</key>
 	<string>com.hopliteconsulting.Pyne</string>
 	<key>InterfaceType</key>
-	<string>Droplet</string>
+	<string>Text Window</string>
 	<key>InterpreterArgs</key>
 	<array/>
 	<key>InterpreterPath</key>
@@ -70,7 +70,7 @@
 	<false/>
 	<key>ScriptArgs</key>
 	<array>
-		<string>-A</string>
+		<string>-AC</string>
 	</array>
 	<key>ScriptPath</key>
 	<string>/Users/oliver.scotten/Documents/GitHub/Pyne/app_build/pyne.py</string>
@@ -273,6 +273,6 @@
 	<key>UniformTypes</key>
 	<array/>
 	<key>Version</key>
-	<string>2.0.0</string>
+	<string>2.0.1</string>
 </dict>
 </plist>
