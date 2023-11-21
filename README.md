@@ -12,6 +12,8 @@ Written by [Oliver Scotten](https://www.github.com/oliv10).
 - REPORT.conf - Data about Findings
 - SORT.conf - Order in which data is shown in output CSV file
 
+If making changes to the configuration files, make sure to re-install the application using pip to make sure the new configurations are applied.
+
 ### Usage
 - Install requirements
 ```
