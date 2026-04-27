@@ -26,6 +26,24 @@ def parseNessusFile(filePath: str, args) -> list:
      # Try to Parse XML Element Tree
      try:
           rawParse = ET.parse(filePath)
+     except ET.ParseError:
+          # Retry after stripping illegal XML characters (e.g. null bytes, control chars)
+          try:
+               import re
+               with open(filePath, "r", encoding="utf-8", errors="replace") as f:
+                    raw = f.read()
+               # Remove characters that are illegal in XML 1.0
+               cleaned = re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]', '', raw)
+               rawParse = ET.fromstring(cleaned)
+               rawParse = ET.ElementTree(rawParse)
+               print(f"[WARNING] Illegal XML characters removed from {filePath} during parsing.")
+          except Exception as err:
+               print(f"Failed to Parse Nessus File: {filePath}")
+               if args.verbose:
+                    print(err)
+               if args.Application:
+                    platypusAlert("Failed to Parse Nessus File", filePath)
+               return False
      except Exception as err:
           print(f"Failed to Parse Nessus File: {filePath}")
           if args.verbose:
@@ -63,6 +81,9 @@ def main(nessusFiles, args):
      for nessusFile in nessusFiles:
           try:
                nessusReport = parseNessusFile(nessusFile, args)
+
+               if nessusReport is False:
+                    continue
 
                # Multi File Output
                if args.out == None:
