@@ -65,7 +65,14 @@ def getHeaderItems(elmnt: Element, elmntList: list) -> list[dict]:
         appDict = elmnt.attrib | item.attrib
         for var in elmntList:
             try:
-                appDict[var] = item.find(f"./{var}").text[:30000] # Character Limit becasue Excel is lame...
+                # Special handling for CVE to capture all CVEs, not just the first
+                if var == 'cve':
+                    cve_elements = item.findall(f"./{var}")
+                    if cve_elements:
+                        cves = [elem.text for elem in cve_elements if elem.text]
+                        appDict[var] = ', '.join(cves)[:30000]  # Join multiple CVEs
+                else:
+                    appDict[var] = item.find(f"./{var}").text[:30000] # Character Limit becasue Excel is lame...
             except:
                 pass
         retList.append(appDict)

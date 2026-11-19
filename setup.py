@@ -16,5 +16,6 @@ setup(
             "pyne = pyne.pyne:setup",
         ],
     },
-    package_data={"pyne": ["config/*"]}
+    package_data={"pyne": ["config/*.conf"]},
+    exclude_package_data={"pyne": ["config/*.local", "config/*.key", "config/*.secret"]}
 )

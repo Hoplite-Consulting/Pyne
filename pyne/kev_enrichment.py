@@ -48,12 +48,32 @@ def read_kev_config(config_path: str) -> str:
 def download_vulncheck_kev(api_key: str) -> tuple:
     """Download VulnCheck KEV data using API key."""
     try:
+        # First request to get download link
         req = urllib.request.Request(VULNCHECK_KEV_URL)
         req.add_header('Authorization', f'Bearer {api_key}')
         req.add_header('Accept', 'application/json')
 
         with urllib.request.urlopen(req, timeout=30) as response:
-            data = json.loads(response.read().decode())
+            metadata = json.loads(response.read().decode())
+
+        # VulnCheck API returns a download link, not the data directly
+        if 'data' in metadata and isinstance(metadata['data'], list) and len(metadata['data']) > 0:
+            download_url = metadata['data'][0].get('url')
+            if not download_url:
+                print(f"[!] VulnCheck response missing download URL")
+                return None, None, 0
+
+            # Download actual catalog from the link
+            with urllib.request.urlopen(download_url, timeout=60) as response:
+                data = json.loads(response.read().decode())
+        else:
+            # Fallback if format is different
+            data = metadata
+
+        # Validate catalog structure
+        if 'data' not in data or not isinstance(data['data'], list):
+            print(f"[!] VulnCheck catalog has unexpected structure")
+            return None, None, 0
 
         # Cache the data
         with open(VULNCHECK_CACHE_FILE, 'w') as f:
@@ -101,10 +121,17 @@ def get_kev_catalog(config_path: str) -> tuple:
         if os.path.exists(VULNCHECK_CACHE_FILE):
             cache_age = datetime.now().timestamp() - os.path.getmtime(VULNCHECK_CACHE_FILE)
             if cache_age < KEV_CACHE_MAX_AGE:
-                print(f"[*] Using cached VulnCheck KEV (age: {cache_age/3600:.1f}h)")
-                with open(VULNCHECK_CACHE_FILE, 'r') as f:
-                    data = json.load(f)
-                    return data, 'vulncheck', len(data.get('data', []))
+                try:
+                    print(f"[*] Using cached VulnCheck KEV (age: {cache_age/3600:.1f}h)")
+                    with open(VULNCHECK_CACHE_FILE, 'r') as f:
+                        data = json.load(f)
+                        # Validate cache structure
+                        if 'data' in data and isinstance(data['data'], list):
+                            return data, 'vulncheck', len(data.get('data', []))
+                        else:
+                            print(f"[!] Cached VulnCheck data is invalid, re-downloading...")
+                except (json.JSONDecodeError, IOError) as e:
+                    print(f"[!] Cache read failed ({e}), re-downloading...")
 
         # Download fresh data
         print("[*] Downloading VulnCheck KEV catalog...")
@@ -122,10 +149,17 @@ def get_kev_catalog(config_path: str) -> tuple:
     if os.path.exists(CISA_KEV_CACHE_FILE):
         cache_age = datetime.now().timestamp() - os.path.getmtime(CISA_KEV_CACHE_FILE)
         if cache_age < KEV_CACHE_MAX_AGE:
-            print(f"[*] Using cached CISA KEV (age: {cache_age/3600:.1f}h)")
-            with open(CISA_KEV_CACHE_FILE, 'r') as f:
-                data = json.load(f)
-                return data, 'cisa', data.get('count', 0)
+            try:
+                print(f"[*] Using cached CISA KEV (age: {cache_age/3600:.1f}h)")
+                with open(CISA_KEV_CACHE_FILE, 'r') as f:
+                    data = json.load(f)
+                    # Validate cache structure
+                    if 'vulnerabilities' in data and isinstance(data['vulnerabilities'], list):
+                        return data, 'cisa', data.get('count', 0)
+                    else:
+                        print(f"[!] Cached CISA data is invalid, re-downloading...")
+            except (json.JSONDecodeError, IOError) as e:
+                print(f"[!] Cache read failed ({e}), re-downloading...")
 
     print("[*] Downloading CISA KEV catalog...")
     data, source, count = download_cisa_kev()
@@ -134,16 +168,24 @@ def get_kev_catalog(config_path: str) -> tuple:
 
     # Try to use any cached version as last resort
     if os.path.exists(VULNCHECK_CACHE_FILE):
-        print("[*] Using stale VulnCheck cache as fallback...")
-        with open(VULNCHECK_CACHE_FILE, 'r') as f:
-            data = json.load(f)
-            return data, 'vulncheck', len(data.get('data', []))
+        try:
+            print("[*] Using stale VulnCheck cache as fallback...")
+            with open(VULNCHECK_CACHE_FILE, 'r') as f:
+                data = json.load(f)
+                if 'data' in data and isinstance(data['data'], list):
+                    return data, 'vulncheck', len(data.get('data', []))
+        except (json.JSONDecodeError, IOError):
+            pass
 
     if os.path.exists(CISA_KEV_CACHE_FILE):
-        print("[*] Using stale CISA cache as fallback...")
-        with open(CISA_KEV_CACHE_FILE, 'r') as f:
-            data = json.load(f)
-            return data, 'cisa', data.get('count', 0)
+        try:
+            print("[*] Using stale CISA cache as fallback...")
+            with open(CISA_KEV_CACHE_FILE, 'r') as f:
+                data = json.load(f)
+                if 'vulnerabilities' in data and isinstance(data['vulnerabilities'], list):
+                    return data, 'cisa', data.get('count', 0)
+        except (json.JSONDecodeError, IOError):
+            pass
 
     print("[!] ERROR: No KEV data available")
     return None, None, 0
@@ -154,19 +196,28 @@ def build_vulncheck_lookup(kev_data: dict) -> dict:
     lookup = {}
 
     for vuln in kev_data.get('data', []):
-        cve_id = vuln.get('cve', '').upper()
-        if not cve_id:
+        # CVE can be a list or string in VulnCheck format
+        cves = vuln.get('cve', [])
+        if isinstance(cves, str):
+            cves = [cves]
+        elif not isinstance(cves, list):
             continue
 
-        lookup[cve_id] = {
-            'dateAdded': vuln.get('date_added', ''),
-            'vulnerabilityName': vuln.get('name', ''),
-            'requiredAction': vuln.get('required_action', ''),
-            'dueDate': vuln.get('due_date', ''),
+        # Map VulnCheck field names to our internal format
+        vuln_details = {
+            'dateAdded': vuln.get('dateAdded', ''),
+            'vulnerabilityName': vuln.get('vulnerabilityName', ''),
+            'requiredAction': vuln.get('requiredAction', ''),
+            'dueDate': vuln.get('dueDate', ''),
             'notes': vuln.get('notes', ''),
             'source': vuln.get('source', 'VulnCheck'),
-            'knownRansomware': vuln.get('known_ransomware_campaign_use', False),
+            'knownRansomware': vuln.get('knownRansomwareCampaignUse', 'Unknown') == 'Known',
         }
+
+        # Add entry for each CVE in the record
+        for cve_id in cves:
+            if cve_id and isinstance(cve_id, str):
+                lookup[cve_id.upper()] = vuln_details
 
     return lookup
 
@@ -297,9 +348,12 @@ def enrich_reports_with_kev(reports: list, config_path: str) -> tuple:
 
     print(f"[+] KEV Enrichment Complete!")
     print(f"    Total findings: {len(reports)}")
-    print(f"    KEV matches: {kev_matches} ({kev_matches/len(reports)*100:.1f}%)")
-    if ransomware_matches > 0:
-        print(f"    ⚠️  Ransomware-linked: {ransomware_matches}")
+    if len(reports) > 0:
+        print(f"    KEV matches: {kev_matches} ({kev_matches/len(reports)*100:.1f}%)")
+        if ransomware_matches > 0:
+            print(f"    ⚠️  Ransomware-linked: {ransomware_matches}")
+    else:
+        print(f"    [!] Warning: No findings to enrich (file parsing may have failed)")
     print(f"    Data source: {source.upper()}\n")
 
     return reports, kev_matches, ransomware_matches
