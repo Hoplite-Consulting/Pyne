@@ -4,10 +4,12 @@ from os.path import exists, splitext
 from csv import DictWriter
 from .platypus import *
 from alive_progress import alive_it
-import pkg_resources
 import time
+from pathlib import Path
 
-SORT_PATH = pkg_resources.resource_filename("pyne.config", "SORT.conf")
+# Get config path using Path
+CONFIG_DIR = Path(__file__).parent / "config"
+SORT_PATH = str(CONFIG_DIR / "SORT.conf")
 
 def readConfig(PATH: str) -> list:
     """_summary_

@@ -1,62 +1,119 @@
 # Pyne
 
-Nessus parser written in Python with config files for easy setup and usage.
+A .nessus file parser that converts Nessus scan results to CSV format.
 
-Written by [Oliver Scotten](https://www.github.com/oliv10).
+## Installation
 
-### Requirements
-- Python 3.10.4 or greater
-
-### Configuration
-- HOST.conf - Data about Host Device
-- REPORT.conf - Data about Findings
-- SORT.conf - Order in which data is shown in output CSV file
-
-If making changes to the configuration files, make sure to re-install the application using pip to make sure the new configurations are applied.
-
-### Usage
-- Install requirements
-```
-pip3 install .
+```bash
+pip3 install -r requirements.txt
+pip3 install -e .
 ```
 
-Run the command ```pyne``` anywhere!
+## Usage
 
+```bash
+# Parse single .nessus file
+python3 -m pyne scan.nessus
+
+# Parse multiple files into separate CSVs
+python3 -m pyne scan1.nessus scan2.nessus scan3.nessus
+
+# Combine multiple scans into one CSV
+python3 -m pyne scan1.nessus scan2.nessus -o combined.csv
 ```
-usage: pyne [-h] [-o OUT] [-s] [-v] [-F] [-C] [-U] nessusFiles [nessusFiles ...]
 
- ______                   
-(_____ \                  
- _____) )   _ ____   ____ 
-|  ____/ | | |  _ \ / _  )
-| |    | |_| | | | ( (/ / 
-|_|     \__  |_| |_|\____)
-       (____/             
+## Flags
 
-Pyne
-2.0.4
+- `-o, --out FILE` - Single output file (combines all scans)
+- `-C, --Category` - Add category to each finding
+- `-U, --UID` - Add unique ID to each finding
+- `-k, --KEV` - **NEW:** Enrich with Known Exploited Vulnerabilities data
+- `-s, --sort` - Sort keys alphabetically
+- `-F, --Force` - Force file write (overwrite existing)
+- `-v, --verbose` - Verbose error messaging
 
-     Pyne is a .nessus file parser.
+## KEV Enrichment (New Feature)
 
-     It can be used in two different ways.
-     It can create multiple CSV output files for every .nessus file input, or it can create one CSV output file from all the .nessus files.
+The `-k/--KEV` flag enriches scan results with [CISA Known Exploited Vulnerabilities](https://www.cisa.gov/known-exploited-vulnerabilities-catalog) data and optionally [VulnCheck KEV](https://vulncheck.com/kev) for more comprehensive coverage.
 
-     This is specified through the '-o/--out' flag.
-     Without using this flag every .nessus file will have an output of the same name and location as the original with .csv appended to the end.
-     With this flag all the .nessus files will be combined into one CSV output at your desired name and location.
+```bash
+# Basic KEV enrichment (uses free CISA KEV catalog)
+python3 -m pyne scan.nessus -k
 
-     The '-C/--Category' flag will add a category to each finding based on Hoplite Consultings standards.
-     
-
-positional arguments:
-  nessusFiles        .nessus file or files or directory of nessus files
-
-options:
-  -h, --help         show this help message and exit
-  -o OUT, --out OUT  single output file location
-  -s, --sort         sort keys alphabetically
-  -v, --verbose      verbose error messaging
-  -F, --Force        force file write
-  -C, --Category     add category to each finding
-  -U, --UID          add unique id to each finding
+# With all features
+python3 -m pyne scan.nessus -k -C -U -o output.csv
 ```
+
+### What KEV Enrichment Adds
+
+When using `-k`, these columns are automatically added to the CSV:
+
+| Column | Description |
+|--------|-------------|
+| `in_kev` | Yes/No - Is this CVE actively exploited? |
+| `kev_date_added` | Date added to KEV catalog |
+| `kev_vulnerability_name` | KEV catalog description |
+| `kev_required_action` | CISA remediation guidance |
+| `kev_due_date` | Federal agency deadline |
+| `kev_source` | Data source (CISA or VulnCheck) |
+| `kev_ransomware_use` | Known ransomware campaign usage |
+| `kev_notes` | Additional context |
+
+**Note:** KEV columns are only added when `-k` flag is used. Without `-k`, output is identical to previous versions.
+
+### VulnCheck API (Optional)
+
+For more comprehensive KEV data (~500 additional CVEs beyond CISA), configure a VulnCheck API key:
+
+```bash
+# Option 1: Config file (create local copy)
+echo "VULNCHECK_API_KEY=your_key_here" > pyne/config/KEV.conf.local
+
+# Option 2: Environment variable
+export VULNCHECK_API_KEY="your_key_here"
+```
+
+Get a free API key at: https://vulncheck.com
+
+Without an API key, Pyne automatically falls back to the free CISA KEV catalog (~1,700+ vulnerabilities).
+
+### Example Output
+
+```bash
+$ python3 -m pyne internal_scan.nessus -k -o report.csv
+
+[*] Downloading CISA KEV catalog...
+[+] Loaded 1,786 KEV entries from CISA
+
+Reading Report... internal_scan.nessus
+[*] KEV Enrichment Starting...
+[+] KEV Enrichment Complete!
+    Total findings: 523
+    KEV matches: 47 (9.0%)
+    ⚠️  Ransomware-linked: 12
+
+Writing to file... report.csv
+```
+
+## Column Customization
+
+Edit `pyne/config/SORT.conf` to control which columns appear and their order in CSV output:
+
+```bash
+# Remove a column: delete the line or comment with #
+# Reorder columns: move lines up/down (top = leftmost in CSV)
+nano pyne/config/SORT.conf
+```
+
+## Compatibility
+
+- **Python 3.8+** (tested up to Python 3.14)
+- Uses `pathlib.Path` instead of deprecated `pkg_resources` for Python 3.14+ compatibility
+
+## Credits
+
+Original Pyne by [Hoplite Consulting](https://github.com/Hoplite-Consulting/Pyne)
+
+## License
+
+See LICENSE file
