@@ -226,15 +226,15 @@ def build_vulncheck_lookup(kev_data: dict) -> dict:
         elif not isinstance(cves, list):
             continue
 
-        # Map VulnCheck field names to our internal format
+        # Map VulnCheck field names (snake_case) to our internal format (camelCase)
         vuln_details = {
-            'dateAdded': vuln.get('dateAdded', ''),
-            'vulnerabilityName': vuln.get('vulnerabilityName', ''),
-            'requiredAction': vuln.get('requiredAction', ''),
-            'dueDate': vuln.get('dueDate', ''),
+            'dateAdded': vuln.get('date_added', ''),
+            'vulnerabilityName': vuln.get('vulnerability_name', ''),
+            'requiredAction': vuln.get('required_action', ''),
+            'dueDate': vuln.get('due_date', ''),
             'notes': vuln.get('notes', ''),
             'source': vuln.get('source', 'VulnCheck'),
-            'knownRansomware': vuln.get('knownRansomwareCampaignUse', 'Unknown') == 'Known',
+            'knownRansomware': vuln.get('known_ransomware_campaign_use', False),
         }
 
         # Add entry for each CVE in the record
