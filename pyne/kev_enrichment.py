@@ -10,6 +10,9 @@ import urllib.request
 from datetime import datetime
 import os
 from pathlib import Path
+import gzip
+import zipfile
+import io
 
 # VulnCheck KEV API (preferred)
 VULNCHECK_KEV_URL = "https://api.vulncheck.com/v3/backup/vulncheck-kev"
@@ -65,7 +68,27 @@ def download_vulncheck_kev(api_key: str) -> tuple:
 
             # Download actual catalog from the link
             with urllib.request.urlopen(download_url, timeout=60) as response:
-                data = json.loads(response.read().decode())
+                raw_data = response.read()
+
+                # Check if it's a ZIP file (starts with PK)
+                if raw_data[:2] == b'PK':
+                    # Extract JSON from ZIP archive
+                    with zipfile.ZipFile(io.BytesIO(raw_data)) as zf:
+                        # Get the JSON file (should be the only file in the archive)
+                        json_filename = [name for name in zf.namelist() if name.endswith('.json')][0]
+                        raw_data = zf.read(json_filename)
+                # Try to decompress if gzipped
+                elif raw_data[:2] == b'\x1f\x8b':
+                    raw_data = gzip.decompress(raw_data)
+
+                # Decode and parse JSON
+                parsed = json.loads(raw_data.decode('utf-8'))
+
+                # VulnCheck KEV is a list of vulnerabilities, wrap it in expected format
+                if isinstance(parsed, list):
+                    data = {'data': parsed}
+                else:
+                    data = parsed
         else:
             # Fallback if format is different
             data = metadata
