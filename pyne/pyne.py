@@ -1,16 +1,20 @@
 #!/usr/bin/python3
 
 from .utils import readConfig, getHostItems, getHeaderItems, getCategory, saveCSVFile, getFileType
+from .kev_enrichment import enrich_reports_with_kev
 import argparse
 import xml.etree.ElementTree as ET
 from .platypus import *
 from alive_progress import alive_it
 import pyfiglet
-import pkg_resources
 import time
+from pathlib import Path
 
-HEADER_PATH = pkg_resources.resource_filename("pyne.config", "HEADER.conf")
-HOST_PATH = pkg_resources.resource_filename("pyne.config", "HOST.conf")
+# Get config paths using Path
+CONFIG_DIR = Path(__file__).parent / "config"
+HEADER_PATH = str(CONFIG_DIR / "HEADER.conf")
+HOST_PATH = str(CONFIG_DIR / "HOST.conf")
+KEV_PATH = str(CONFIG_DIR / "KEV.conf")
 
 HEADER_CONFIG = readConfig(HEADER_PATH)
 HOST_CONFIG = readConfig(HOST_PATH)
@@ -87,6 +91,10 @@ def main(nessusFiles, args):
 
                # Multi File Output
                if args.out == None:
+                    # Apply KEV enrichment if requested
+                    if args.KEV:
+                         nessusReport, kev_matches, ransomware_matches = enrich_reports_with_kev(nessusReport, KEV_PATH)
+
                     path = nessusFile + ".csv"
                     saveCSVFile(nessusReport, path, args)
                     if args.Application:
@@ -103,8 +111,12 @@ def main(nessusFiles, args):
                     print(err)
                if args.Application:
                     platypusAlert("Unable to Parse File", nessusFile)
-     
+
      if args.out != None:
+          # Apply KEV enrichment if requested
+          if args.KEV:
+               reportsList, kev_matches, ransomware_matches = enrich_reports_with_kev(reportsList, KEV_PATH)
+
           saveCSVFile(reportsList, args.out, args)
           if args.Application:
                platypusNotification("Parse Completed", f"Output Saved to {args.out}")
@@ -114,7 +126,7 @@ def main(nessusFiles, args):
 
 def setup():
 
-     __version__ = "2.0.4"
+     __version__ = "2.1.0"
      NAME = "Pyne"
      DESC = """
      Pyne is a .nessus file parser.
@@ -127,6 +139,7 @@ def setup():
      With this flag all the .nessus files will be combined into one CSV output at your desired name and location.
 
      The '-C/--Category' flag will add a category to each finding based on Hoplite Consultings standards.
+     The '-k/--KEV' flag will enrich findings with Known Exploited Vulnerabilities (KEV) data from CISA/VulnCheck.
      """
      TITLE = pyfiglet.figlet_format(NAME, font="stop") + f"\n{NAME}\n{__version__}\n{DESC}"
 
@@ -139,6 +152,7 @@ def setup():
      PARSER.add_argument('-F', '--Force', action='store_true', help='force file write')
      PARSER.add_argument('-C', '--Category', action='store_true', help='add category to each finding')
      PARSER.add_argument('-U', '--UID', action='store_true', help='add unique id to each finding')
+     PARSER.add_argument('-k', '--KEV', action='store_true', help='enrich with Known Exploited Vulnerabilities (KEV) data')
      PARSER.add_argument('-A', '--Application', action='store_true', help=argparse.SUPPRESS) # This flag is used in a compiled application version to give notifications to the user.
      PARSER.add_argument('-S', '--Slow', action='store_true', help=argparse.SUPPRESS) # Runs the program slowly so you can watch the flashy loading bar.
 

@@ -4,10 +4,12 @@ from os.path import exists, splitext
 from csv import DictWriter
 from .platypus import *
 from alive_progress import alive_it
-import pkg_resources
 import time
+from pathlib import Path
 
-SORT_PATH = pkg_resources.resource_filename("pyne.config", "SORT.conf")
+# Get config path using Path
+CONFIG_DIR = Path(__file__).parent / "config"
+SORT_PATH = str(CONFIG_DIR / "SORT.conf")
 
 def readConfig(PATH: str) -> list:
     """_summary_
@@ -63,7 +65,14 @@ def getHeaderItems(elmnt: Element, elmntList: list) -> list[dict]:
         appDict = elmnt.attrib | item.attrib
         for var in elmntList:
             try:
-                appDict[var] = item.find(f"./{var}").text[:30000] # Character Limit becasue Excel is lame...
+                # Special handling for CVE to capture all CVEs, not just the first
+                if var == 'cve':
+                    cve_elements = item.findall(f"./{var}")
+                    if cve_elements:
+                        cves = [elem.text for elem in cve_elements if elem.text]
+                        appDict[var] = ', '.join(cves)[:30000]  # Join multiple CVEs
+                else:
+                    appDict[var] = item.find(f"./{var}").text[:30000] # Character Limit becasue Excel is lame...
             except:
                 pass
         retList.append(appDict)
